@@ -36,7 +36,7 @@ public class ProjectTest {
 
         // Module directories
         List<File> moduleDirs = project.getModuleDirs();
-        Set<File> moduleDirSet = new HashSet(moduleDirs);
+        Set<File> moduleDirSet = new HashSet<>(moduleDirs);
         Set<File> expectedModules = new HashSet<>();
         expectedModules.add(GRADLE_MULTI_DIR.getAbsoluteFile());
         expectedModules.add(new File (GRADLE_MULTI_DIR, "module1").getAbsoluteFile());

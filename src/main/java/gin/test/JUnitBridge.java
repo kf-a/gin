@@ -6,8 +6,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Executable;
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import org.junit.runner.JUnitCore;
@@ -21,7 +19,7 @@ import org.pmw.tinylog.Logger;
  * Runs a given test in the same JVM as this class.
  */
 public class JUnitBridge {
-
+	
     public static final String BRIDGE_METHOD_NAME = "runTest";
 
     /**
@@ -113,7 +111,7 @@ public class JUnitBridge {
     }
 
      // A hack to add a timeout to the method using Java reflection.
-     // It also checks that a given test method exists. Parametirised test methods are not allowed (following JUnit standard).
+     // It also checks that a given test method exists. Parameterised test methods are not allowed (following JUnit standard).
     protected static void annotateTestWithTimeout(Class<?> clazz, String methodName, long timeout) throws NoSuchMethodException, NoSuchFieldException, IllegalAccessException {
 
         Field annotations = Executable.class.getDeclaredField("declaredAnnotations");

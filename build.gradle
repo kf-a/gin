@@ -6,8 +6,9 @@ plugins {
 
 apply plugin: 'java'
 apply plugin: 'application'
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+
+sourceCompatibility = 11
+targetCompatibility = 11
 
 mainClassName = "gin.LocalSearch"
 
@@ -88,6 +89,8 @@ shadowJar {
 }
 
 test {
+	jvmArgs = ["--add-opens", "java.base/java.lang.reflect=ALL-UNNAMED"] // this is needed to allow reflective access to java.lang.reflect.Executable in JUnitBridge.annotateTestWithTimeout() post Java 8 (https://github.com/gintool/gin/issues/29)
+
     //we want display the following test events
     testLogging {
         events "PASSED", "STARTED", "FAILED", "SKIPPED"

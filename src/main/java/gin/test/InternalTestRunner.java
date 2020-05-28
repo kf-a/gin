@@ -119,11 +119,8 @@ public class InternalTestRunner extends TestRunner {
 
         Object runner = null;
         try {
-            runner = runnerClass.newInstance();
-        } catch (InstantiationException e) {
-            Logger.error("Could not instantiate isolated test runner: " + e);
-            System.exit(-1);
-        } catch (IllegalAccessException e) {
+            runner = runnerClass.getDeclaredConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             Logger.error("Could not instantiate isolated test runner: " + e);
             System.exit(-1);
         }

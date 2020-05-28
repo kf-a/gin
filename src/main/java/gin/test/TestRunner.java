@@ -71,7 +71,7 @@ public abstract class TestRunner {
         // Set up list of tests based on the class name
         List<UnitTest> tests = new LinkedList<>();
 
-        Class clazz = null;
+        Class<?> clazz = null;
 
         try {
             clazz = classLoader.loadClass(testClassName);

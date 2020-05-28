@@ -2,7 +2,6 @@ package gin.test;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
-import java.util.List;
 
 import org.junit.runner.Description;
 import org.junit.runner.Result;
