@@ -97,3 +97,10 @@ test {
         //showStandardStreams = true
     }
 }
+
+// fix to allow main gin project in eclipse too
+String prefix = projectDir.parentFile.name
+allprojects { p ->
+   apply plugin: 'eclipse' 
+   eclipse.project.name = "${prefix}-${p.name}"
+}
