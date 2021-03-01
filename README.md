@@ -26,7 +26,7 @@ These instructions will show you how to build Gin and run a simple local search 
 
 Gin requires:
 
-* JDK 11  *note: there is currently a known issue that prevents Gin running on JDK 9 Aand above*
+* JDK 11  *note: from java 9 and above, you must add `--add-opens java.base/java.lang.reflect=ALL-UNNAMED` to the JVM options when running Gin to allow reflective access*
 * Gradle (tested with version 4.10.2)
 * A number of dependencies, which can be downloaded manually or via Gradle (recommended)
 * For Maven projects: make sure the Java version is set to 11
@@ -83,7 +83,7 @@ gradle javadoc
 If you build the fat jar as above, you can run Gin's local search on a simple example with:
 
 ```
-java -jar build/gin.jar -f examples/triangle/Triangle.java -m "classifyTriangle(int,int,int)"
+java --add-opens java.base/java.lang.reflect=ALL-UNNAMED -jar build/gin.jar -f examples/triangle/Triangle.java -m "classifyTriangle(int,int,int)"
 ```
 
 100 steps will be run by default. Your output will be similar to the following:
@@ -104,7 +104,7 @@ The output tells you for each step whether a patch was invalid (e.g. because it 
 We use tinylog for logging, allowing for several logging variants, for example:
 
 ```
-java -Dtinylog.format="{level}: {message}" -Dtinylog.level=debug -jar build/gin.jar -f examples/triangle/Triangle.java -m "classifyTriangle(int,int,int)"
+java --add-opens java.base/java.lang.reflect=ALL-UNNAMED -Dtinylog.format="{level}: {message}" -Dtinylog.level=debug -jar build/gin.jar -f examples/triangle/Triangle.java -m "classifyTriangle(int,int,int)"
 ```
 
 ## Utilities
@@ -112,7 +112,7 @@ java -Dtinylog.format="{level}: {message}" -Dtinylog.level=debug -jar build/gin.
 For input arguments to the list of utilities mentioned below, simply run:
 
 ```
-java -cp build/gin.jar gin.<utility_name>
+java --add-opens java.base/java.lang.reflect=ALL-UNNAMED -cp build/gin.jar gin.<utility_name>
 ```
 
 ## Analysing Patches
@@ -120,7 +120,7 @@ java -cp build/gin.jar gin.<utility_name>
 Gin provides a simple tool called PatchAnalyser, which will run a patch specified as a commandline argument and report execution time improvement, as well as dumping out annotated source files indicating statement numbering etc.
 
 ```
-java -cp build/gin.jar gin.PatchAnalyser -f examples/triangle/Triangle.java -p "| gin.edit.line.DeleteLine examples/triangle/Triangle.java:10 |"
+java --add-opens java.base/java.lang.reflect=ALL-UNNAMED -cp build/gin.jar gin.PatchAnalyser -f examples/triangle/Triangle.java -p "| gin.edit.line.DeleteLine examples/triangle/Triangle.java:10 |"
 ```
 
 ## Profiling for Maven and Gradle projects
@@ -130,7 +130,7 @@ Gin also provides a Profiler that identifies those parts of the software most ex
 Before you run the below, please make sure you have Maven installed. The default Maven home path is set to '/usr/local/' (with binary in '/usr/local/bin/mvn'). Please change the path with -mavenHome parameter, if need be. 
 
 ```
-java -cp build/gin.jar gin.util.Profiler -p my-app -d examples/maven-simple/ -mavenHome <path_to_mavenHome>
+java --add-opens java.base/java.lang.reflect=ALL-UNNAMED -cp build/gin.jar gin.util.Profiler -p my-app -d examples/maven-simple/ -mavenHome <path_to_mavenHome>
 ```
 
 The output is saved in profiler_output.csv. Note that this is empty for the simple project above as Profiler depends on hprof and inherits its constraints.
@@ -173,25 +173,25 @@ We provide three subclasses to show example usage scenarios and show how easily 
 EmptyPatchTester simply runs all the project tests (declared in the input method file) through Gin:
 
 ```
-java -cp build/gin.jar gin.util.EmptyPatchTester -d examples/triangle/ -c examples/triangle/ -m examples/triangle/method_file.csv
+java --add-opens java.base/java.lang.reflect=ALL-UNNAMED -cp build/gin.jar gin.util.EmptyPatchTester -d examples/triangle/ -c examples/triangle/ -m examples/triangle/method_file.csv
 ```
 
 DeleteEnumerator deletes each line and each statement in a method (sampled at random, without replacement) and saves the result to sampler_output.csv. 
 
 ```
-java -cp build/gin.jar gin.util.DeleteEnumerator -d examples/triangle/ -c examples/triangle/ -m examples/triangle/method_file.csv
+java --add-opens java.base/java.lang.reflect=ALL-UNNAMED -cp build/gin.jar gin.util.DeleteEnumerator -d examples/triangle/ -c examples/triangle/ -m examples/triangle/method_file.csv
 ```
 
 RandomSampler makes random edits to a project and saves the results to sampler_output.csv. 
 
 ```
-java -cp build/gin.jar gin.util.RandomSampler -d examples/triangle/ -c examples/triangle/ -m examples/triangle/method_file.csv
+java --add-opens java.base/java.lang.reflect=ALL-UNNAMED -cp build/gin.jar gin.util.RandomSampler -d examples/triangle/ -c examples/triangle/ -m examples/triangle/method_file.csv
 ```
 
 Assuming EvoSuite tests were generated and original tests not removed:
 
 ```
-java -cp build/gin.jar:testgeneration/evosuite-1.0.6.jar gin.util.RandomSampler -d examples/maven-simple -p my-app -m examples/maven-simple/example_profiler_results.csv -mavenHome <path_to_mavenHome>
+java --add-opens java.base/java.lang.reflect=ALL-UNNAMED -cp build/gin.jar:testgeneration/evosuite-1.0.6.jar gin.util.RandomSampler -d examples/maven-simple -p my-app -m examples/maven-simple/example_profiler_results.csv -mavenHome <path_to_mavenHome>
 ```
 
 ## Test Runners
@@ -200,12 +200,12 @@ The tests can be run internally (through InternalTestRunner), or in a separate j
 
 Tests run in a separate jvm:
 ```
-java -cp build/gin.jar gin.util.EmptyPatchTester -d examples/triangle/ -c examples/triangle/ -m examples/triangle/method_file.csv -j
+java --add-opens java.base/java.lang.reflect=ALL-UNNAMED -cp build/gin.jar gin.util.EmptyPatchTester -d examples/triangle/ -c examples/triangle/ -m examples/triangle/method_file.csv -j
 ```
 
 Each test case run in a separate jvm:
 ```
-java -cp build/gin.jar gin.util.EmptyPatchTester -d examples/triangle/ -c examples/triangle/ -m examples/triangle/method_file.csv -J
+java --add-opens java.base/java.lang.reflect=ALL-UNNAMED -cp build/gin.jar gin.util.EmptyPatchTester -d examples/triangle/ -c examples/triangle/ -m examples/triangle/method_file.csv -J
 ```
 ## Full Example with a Maven Project
 
@@ -227,17 +227,17 @@ mvn test
 
 Run Gin's Profiler. In this case we limit to the first 20 tests for speed using `-n 20`. Results are written to a CSV. This CSV is used to specify the target methods and unit tests for the samplers below.
 ```
-projectnameforgin='spatial4j'; java -Dtinylog.level=trace -cp ../../build/gin.jar gin.util.Profiler -r 1 -mavenHome /usr/share/maven -n 20 -p $projectnameforgin -d . -o $projectnameforgin.Profiler_output.csv
+projectnameforgin='spatial4j'; java --add-opens java.base/java.lang.reflect=ALL-UNNAMED -Dtinylog.level=trace -cp ../../build/gin.jar gin.util.Profiler -r 1 -mavenHome /usr/share/maven -n 20 -p $projectnameforgin -d . -o $projectnameforgin.Profiler_output.csv
 ```
 
 Run EmptyPatchTester. This serves as a baseline, showing the performance of the original unaltered code against the unit tests.
 ```
-projectnameforgin='spatial4j'; java -Dtinylog.level=trace -cp ../../build/gin.jar gin.util.EmptyPatchTester -J -p $projectnameforgin -d . -m $projectnameforgin.Profiler_output.csv -o $projectnameforgin.EmptyPatchTester_output.csv  -mavenHome /usr/share/maven
+projectnameforgin='spatial4j'; java --add-opens java.base/java.lang.reflect=ALL-UNNAMED -Dtinylog.level=trace -cp ../../build/gin.jar gin.util.EmptyPatchTester -J -p $projectnameforgin -d . -m $projectnameforgin.Profiler_output.csv -o $projectnameforgin.EmptyPatchTester_output.csv  -mavenHome /usr/share/maven
 ```
 
 Run RandomSampler to test the effect of different edits in the space. Here, we limit to statement edits; we allow only 1 edit per patch; and we test 100 edits sampled at random.
 ```
-projectnameforgin='spatial4j'; editType='STATEMENT'; patchSize='1'; patchNumber='100'; java -Dtinylog.level=trace -cp ../../build/gin.jar gin.util.RandomSampler -j -p $projectnameforgin -d . -m $projectnameforgin.Profiler_output.csv -o $projectnameforgin.RandomSampler_${editType}_patchSize${patchSize}_patchNumber${patchNumber}_output.csv -mavenHome /usr/share/maven -editType $editType -patchNumber $patchNumber -patchSize $patchSize
+projectnameforgin='spatial4j'; editType='STATEMENT'; patchSize='1'; patchNumber='100'; java --add-opens java.base/java.lang.reflect=ALL-UNNAMED -Dtinylog.level=trace -cp ../../build/gin.jar gin.util.RandomSampler -j -p $projectnameforgin -d . -m $projectnameforgin.Profiler_output.csv -o $projectnameforgin.RandomSampler_${editType}_patchSize${patchSize}_patchNumber${patchNumber}_output.csv -mavenHome /usr/share/maven -editType $editType -patchNumber $patchNumber -patchSize $patchSize
 ```
 
 ## Contributing
