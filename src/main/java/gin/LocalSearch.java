@@ -99,7 +99,7 @@ public class LocalSearch {
     }
 
     // Constructor parses arguments
-    LocalSearch(String[] args) {
+    public LocalSearch(String[] args) {
 
         Args.parseOrExit(this, args);
         editTypes = Edit.parseEditClassesFromString(editType);
@@ -153,7 +153,7 @@ public class LocalSearch {
 
     }
     
-    private void search()
+    public void search()
     {
     	if(homEnabled) {
     		searchWithHOM();

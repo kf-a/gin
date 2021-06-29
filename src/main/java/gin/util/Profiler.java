@@ -59,6 +59,11 @@ public class Profiler {
 
     @Argument(alias = "hi", description="Interval for hprof's CPU sampling in milliseconds")
     protected Long hprofInterval = 10L;
+    
+    @Argument(alias = "dw", description = "if true does not write results to csv")
+    public boolean dontWrite = false;
+
+    private List<HotMethod> hotMethods;
 
     // Constants
 
@@ -127,10 +132,14 @@ public class Profiler {
 
         Collections.sort(hotMethods, Collections.reverseOrder());
 
-        writeResults(hotMethods);
+        this.hotMethods = hotMethods;
 
-
+        if (!dontWrite){
+            writeResults(hotMethods);
+        }
     }
+
+    public List<HotMethod> get_hotMethods(){ return this.hotMethods; }
 
     private void reportSummary(Map<UnitTest, ProfileResult> results) {
 
@@ -343,13 +352,17 @@ public class Profiler {
 
     }
 
-    class HotMethod implements Comparable<HotMethod> {
+    public class HotMethod implements Comparable<HotMethod> {
 
         HotMethod(String method, int count, Set<UnitTest> tests) {
             this.methodName = method;
             this.count = count;
             this.tests = tests;
         }
+
+        public String getName(){ return this.methodName; }
+
+        public Set<UnitTest> getTests() {return this.tests; }
 
 
         String methodName;
