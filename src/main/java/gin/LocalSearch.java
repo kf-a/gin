@@ -244,11 +244,12 @@ public class LocalSearch {
 	    	kthSmallest(tournamentList,0,tournamentSize-1,2);
 	    	childGeneration.add(crossover(tournamentList.get(0).getPatch(),tournamentList.get(1).getPatch()));
     	}
-    	//Mutation Probability is 0.2
-    	//find random Patches, perform Pointmutations and add them in the childGeneraion
-    	for(int i=0; i<0.2*(populationSize-eliteSize); ++i) {
+
+    	//find random Patches, perform Pointmutations and add them in the childGeneraion until the populationsize is reached
+    	for(int i=0; i<(populationSize-eliteSize); ++i) {
     		Patch patchToMutate = testResultSets.get(rng.nextInt(testResultSets.size())).getPatch();
-    		childGeneration.add(pointMutation(patchToMutate));
+            childGeneration.add(pointMutation(patchToMutate));
+
     	}
     	
     	return EvolutionarySearch(childGeneration, --iterationCounter);
@@ -259,10 +260,20 @@ public class LocalSearch {
     	if(rng.nextBoolean())	return p1;
     	else	return p2;
     }
-    //dummy for pointMutation method
+
+    /**
+     * Create enough FOM for a unique patch in the next generation
+     * @param patch that needs to be mutated
+     * @return result mutated patch for the next generation
+     */
     private Patch pointMutation(Patch patch) {
-    	patch.addRandomEditOfClasses(rng, editTypes);
-    	return patch;
+        int maxmutations = rng.nextInt(Math.max((populationSize - eliteSize), 5));
+        Patch result = patch.clone();
+    	while(maxmutations>0){
+            result=neighbour(result);
+            maxmutations--;
+        }
+    	return result;
     }
     
     private List<Patch> getFitterPatches()
