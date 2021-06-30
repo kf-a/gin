@@ -9,6 +9,8 @@ import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.sound.midi.Patch;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.rng.simple.JDKRandomBridge;
 import org.apache.commons.rng.simple.RandomSource;
@@ -255,10 +257,22 @@ public class LocalSearch {
     	return EvolutionarySearch(childGeneration, --iterationCounter);
     }
     
-    //dummy for crossover method
+    //Crossover of two patches using a randomized boolean
     private Patch crossover(Patch p1, Patch p2) {
-    	if(rng.nextBoolean())	return p1;
-    	else	return p2;
+    	int length=p1.size();
+    	List<Patch>	child1=new ArrayList<Patch>();
+    	for(int i=0; i<length;i++) {   			
+    		if(rng.nextBoolean()) {
+    			if(!child1.contains(p1.get(i))
+    					child1.add(p1.get(i));  			
+    		}
+    		else {
+    			if(!child1.contains(p2.get(i)))
+    				child1.add(p2.get(i));    			
+    		}		
+    	}
+    	   
+    return child1;
     }
 
     /**
