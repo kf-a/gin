@@ -40,12 +40,16 @@ public class ProfilerSensitivity {
 
     }
 
-    public void main(String[] args){
-        Logger.info(String.format("You are using genetic improvement with higher order mutants and" +
-                " test suite profiling for the Project: %s ",this.projectName));
-        ProfilerSensitivity ps = new ProfilerSensitivity(args);
+    public static void main(String[] args){
 
-        //Start the profiler
+        ProfilerSensitivity ps = new ProfilerSensitivity(args);
+        ps.profileSensitivity();
+    }
+
+	public void profileSensitivity() {
+		Logger.info(String.format("You are using genetic improvement with higher order mutants and" +
+                " test suite profiling for the Project: %s ",this.projectName));
+		//Start the profiler
         Logger.info("Starting the Profiler. This may take a long time, if the test suite is large");
         this.profiler.profile();
 
@@ -55,11 +59,11 @@ public class ProfilerSensitivity {
 
         //Iterate through the best hotMethods, hotMethods is already sorted
         int iteratorMax = Math.min(this.targetMethodNumber, hotMethods.size());
-        Logger.info(String.format("Starting Improvement with %o hottest methods",iteratorMax));
+        Logger.info(String.format("Starting Improvement with %d hottest methods",iteratorMax));
         for (int i = 0; i<iteratorMax; i++){
             //build Input for LocalSearch
             Profiler.HotMethod method = hotMethods.get(i);
-            String methodname = method.getName();
+            String methodname = trimMethodName(method);
             String file = findFile(method);
 
             String[] lsArgs = new String[3];
@@ -69,21 +73,26 @@ public class ProfilerSensitivity {
 
             //run LocalSearch
             Logger.info(String.format("Improving Method %s in File %s", lsArgs[1], lsArgs[0]));
+            //TODO parsing args in LocalSearch-constructor not working
             LocalSearch ls = new LocalSearch(lsArgs);
             ls.search();
             //todo: collect results
         }
-    }
+	}
 
     //todo: check correctness of this
     private String findFile(Profiler.HotMethod method){
-        Set<UnitTest> tests = method.getTests();
-        for (UnitTest test: tests){
-            if (test.getMethodName().equals(method.getName())){
-                return test.getModuleName();
-            }
-        }
-        return "";
-
+        String name = method.getName();
+        int p=name.lastIndexOf(".");
+        String filename=name.substring(0,p);
+        filename = filename.replace(".",File.separator);
+        filename = "src"+File.separator+"main"+File.separator+"java"+File.separator+filename+".java";
+        return filename;
+    }
+    private String trimMethodName(Profiler.HotMethod method){
+        String name = method.getName();
+        int p=name.lastIndexOf(".");
+        String methodname=name.substring(p+1,name.length()-1);
+        return methodname;
     }
 }

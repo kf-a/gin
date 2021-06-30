@@ -37,7 +37,7 @@ public class Profiler {
     protected Integer reps = 1;
 
     @Argument(alias = "h", description = "Path to maven bin directory e.g. /usr/local/")
-    protected File mavenHome = new File("/usr/local/");  // default on OS X
+    protected File mavenHome = new File("/usr/share/maven");  // default on Linux
 
     @Argument(alias = "v", description = "Set Gradle version")
     protected String gradleVersion;
@@ -49,7 +49,7 @@ public class Profiler {
     protected Boolean skipInitialRun = false;
 
     @Argument(alias = "n", description = "Only mavenProfile the first n tests. For debugging.")
-    protected Integer profileFirstNTests;
+    protected Integer profileFirstNTests=20;
 
     @Argument(alias = "t", description = "Run given maven task rather than test")
     protected String mavenTaskName = "test";
@@ -59,7 +59,7 @@ public class Profiler {
 
     @Argument(alias = "hi", description="Interval for hprof's CPU sampling in milliseconds")
     protected Long hprofInterval = 10L;
-    
+
     @Argument(alias = "dw", description = "if true does not write results to csv")
     public boolean dontWrite = false;
 
