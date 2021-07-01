@@ -9,8 +9,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.sound.midi.Patch;
-
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.rng.simple.JDKRandomBridge;
 import org.apache.commons.rng.simple.RandomSource;
@@ -244,7 +242,7 @@ public class LocalSearch {
 	    	}
 	    	//order list for two elements with best fitness, perform crossover on these two patches
 	    	kthSmallest(tournamentList,0,tournamentSize-1,2);
-	    	childGeneration.add(crossover(tournamentList.get(0).getPatch(),tournamentList.get(1).getPatch()));
+	    	childGeneration=crossover(tournamentList.get(0).getPatch(),tournamentList.get(1).getPatch(),childGeneration)
     	}
 
     	//find random Patches, perform Pointmutations and add them in the childGeneraion until the populationsize is reached
@@ -257,10 +255,10 @@ public class LocalSearch {
     	return EvolutionarySearch(childGeneration, --iterationCounter);
     }
     
-    //Crossover of two patches using a randomized boolean
-    private Patch crossover(Patch p1, Patch p2) {
+    //Crossover of two patches using a randomized boolean  
+    private List<Patch> crossover(Patch p1, Patch p2,List<Patch>childGeneration) {
     	int length=p1.size();
-    	List<Patch>	child1=new ArrayList<Patch>();
+    	Patch child1=new Patch(this.sourceFile);
     	for(int i=0; i<length;i++) {   			
     		if(rng.nextBoolean()) {
     			if(!child1.contains(p1.get(i))
@@ -271,8 +269,8 @@ public class LocalSearch {
     				child1.add(p2.get(i));    			
     		}		
     	}
-    	   
-    return child1;
+    childGeneration.add(child1);	   
+    return childGeneration;
     }
 
     /**
