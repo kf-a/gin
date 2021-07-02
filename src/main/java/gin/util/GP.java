@@ -5,7 +5,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.Collections;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.HashMap;
+import java.util.Set;
 import java.util.Random;
 
 import com.opencsv.CSVWriter;
@@ -44,6 +47,15 @@ public abstract class GP extends Sampler {
 
     @Argument(alias = "is", description = "Random seed for individual selection")
     protected Integer individualSeed = 123;
+    
+    @Argument(alias = "hom", description = "Toggle higher-order mutations in GP")
+    protected boolean homEnabled = false;
+    
+    @Argument(alias = "pn", description = "Patch number for finding FOMs in RandomSampler")
+    protected Integer patchNumber = 100;
+    
+    @Argument(alias = "homsize", description = "Number of FOMs to combine for HOM in initial HOM population")
+    protected Integer homSize = 2;
     
     // Allowed edit types for sampling: parsed from editType
     protected List<Class<? extends Edit>> editTypes;
@@ -86,25 +98,53 @@ public abstract class GP extends Sampler {
         } else {
 
             writeNewHeader();
+            
+            if(homEnabled) {
+            	RandomSampler randomSampler = new RandomSampler(this.projectDirectory,this.methodFile);
+                randomSampler.methodData = this.methodData;
+                randomSampler.patchNumber = this.patchNumber;
+                randomSampler.classPath = this.classPath;
+                randomSampler.editType= this.editType;
+                Map<TargetMethod, List<UnitTestResultSet>> targetMap = randomSampler.sampleMethodsGP();
+                
+                Set<TargetMethod> targetMethods = targetMap.keySet();
+                
+                Logger.info(String.format("RandomSampler found %s methods", targetMethods.size()));
+                
+                for(TargetMethod method : targetMethods) {
+                	List<UnitTestResultSet> unitTestResultSets = targetMap.get(method);
+                	
+                	Logger.info("Running HOM-GP on method " + method);
 
-            for (TargetMethod method : methodData) {
+                    // Setup SourceFile for patching
+                    SourceFile sourceFile = SourceFile.makeSourceFileForEditTypes(editTypes, method.getFileSource().getPath(), Collections.singletonList(method.getMethodName()));
 
-                Logger.info("Running GP on method " + method);
+                    search(method, new Patch(sourceFile), unitTestResultSets);
+                }
+            }
+            
+            else {
+            	for (TargetMethod method : methodData) {
 
-                // Setup SourceFile for patching
-                SourceFile sourceFile = SourceFile.makeSourceFileForEditTypes(editTypes, method.getFileSource().getPath(), Collections.singletonList(method.getMethodName()));
+                    Logger.info("Running GP on method " + method);
 
-                search(method, new Patch(sourceFile));
+                    // Setup SourceFile for patching
+                    SourceFile sourceFile = SourceFile.makeSourceFileForEditTypes(editTypes, method.getFileSource().getPath(), Collections.singletonList(method.getMethodName()));
 
+                    search(method, new Patch(sourceFile));
+
+                }
             }
         }
-
     }
 
        /*============== Abstract methods  ==============*/
 
     // GP search strategy
     protected abstract void search(TargetMethod method, Patch origPatch);
+    
+    // GP HOM search strategy
+    protected abstract void search(TargetMethod method, Patch origPatch, List<UnitTestResultSet> unitTestResultSets);
 
     // Individual selection
     protected abstract List<Patch> select(Map<Patch, Double> population, Patch origPatch, double origFitness);

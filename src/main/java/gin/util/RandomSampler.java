@@ -3,7 +3,10 @@ package gin.util;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Random;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.rng.simple.JDKRandomBridge;
 import org.apache.commons.rng.simple.RandomSource;
@@ -113,6 +116,61 @@ public class RandomSampler extends Sampler {
         }
 
    }
+   
+
+   public Map<TargetMethod, List<UnitTestResultSet>> sampleMethodsGP() {
+
+	   Map<TargetMethod, List<UnitTestResultSet>> targetMap = new HashMap<>();
+       Random mrng = new JDKRandomBridge(RandomSource.MT, Long.valueOf(methodSeed)); 
+       
+       if (patchSize > 0) {
+
+           int size = methodData.size();
+
+           Logger.info("Start applying and testing random FOM-patches by RandomSampler..");
+
+           for (int i = 0; i < patchNumber; i++) {
+               Random prng = new JDKRandomBridge(RandomSource.MT, Long.valueOf(patchSeed + (100000 * i)));
+               
+               // Pick a random method
+               TargetMethod method = methodData.get(mrng.nextInt(size));
+               Integer methodID = method.getMethodID(); 
+               File source = method.getFileSource();
+
+               // Setup SourceFile for patching
+               SourceFile sourceFile = SourceFile.makeSourceFileForEditTypes(editTypes, source.getPath(), Collections.singletonList(method.getMethodName()));
+
+               Patch patch = new Patch(sourceFile);
+               for (int j = 0; j < patchSize; j++) {
+                   patch.addRandomEditOfClasses(prng, editTypes);
+               }
+
+               Logger.info("Testing random patch " + patch + " for method: " + method + " with ID " + methodID);
+
+               
+               // Test the patched source file
+               UnitTestResultSet results = testPatch(method.getClassName(), method.getGinTests(), patch);
+               
+               if(targetMap.get(method)==null) {
+            	   List<UnitTestResultSet> testResultSets = new ArrayList();
+            	   testResultSets.add(results);
+            	   targetMap.put(method,testResultSets);
+               }
+               else {
+            	   targetMap.get(method).add(results);
+               }
+               
+           }
+
+       Logger.info("Results parsed.");
+       return targetMap;
+       
+       } else {
+           Logger.info("Number of edits  must be greater than 0.");
+           return null;
+       }
+
+  }
 
 
 }
