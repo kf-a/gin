@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.pmw.tinylog.Logger;
 
@@ -104,6 +105,9 @@ public abstract class GPSimple extends GP {
 
             // Current generation
             Map<Patch, Double> newPopulation = new HashMap<>();
+
+            // Add Elites
+            add_elites(population, newPopulation);
 
             // Select individuals for crossover
             List<Patch> selectedPatches = select(population, origPatch, orig);
@@ -272,6 +276,9 @@ public abstract class GPSimple extends GP {
             // Current generation
             Map<Patch, Double> newPopulation = new HashMap<>();
 
+            // Add Elites
+            add_elites(population, newPopulation);
+
             // Select individuals for crossover
             List<Patch> selectedPatches = select(population, origPatch, orig);
 
@@ -313,6 +320,17 @@ public abstract class GPSimple extends GP {
     }
 
     /*====== GP Operators ======*/
+
+    // Adds elites from old population to new population
+    protected void add_elites(Map<Patch, Double> oldPopulation, Map<Patch, Double> newPopulation){
+        Map<Patch,Double> elites = oldPopulation.entrySet().stream()
+                .sorted(Map.Entry.<Patch,Double>comparingByValue().reversed())
+                .limit(eliteSize)
+                .collect(Collectors.toMap(Map.Entry::getKey,
+                        Map.Entry::getValue));
+        newPopulation.putAll(elites);
+    }
+
 
     // Adds a random edit of the given type with equal probability among allowed types
     protected Patch mutate(Patch oldPatch) {

@@ -56,6 +56,10 @@ public abstract class GP extends Sampler {
     
     @Argument(alias = "homsize", description = "Number of FOMs to combine for HOM in initial HOM population")
     protected Integer homSize = 2;
+
+    // Elite size
+    @Argument(alias = "e", description = "Number of elites for evolutionary search")
+    protected Integer eliteSize = 10;
     
     // Allowed edit types for sampling: parsed from editType
     protected List<Class<? extends Edit>> editTypes;
