@@ -256,6 +256,12 @@ Run RandomSampler to test the effect of different edits in the space. Here, we l
 projectnameforgin='spatial4j'; editType='STATEMENT'; patchSize='1'; patchNumber='100'; java -Dtinylog.level=trace -cp ../../build/gin.jar gin.util.RandomSampler -j -p $projectnameforgin -d . -m $projectnameforgin.Profiler_output.csv -o $projectnameforgin.RandomSampler_${editType}_patchSize${patchSize}_patchNumber${patchNumber}_output.csv -mavenHome /usr/share/maven -editType $editType -patchNumber $patchNumber -patchSize $patchSize
 ```
 
+## HOM Example with a Maven Project
+Run GPSimple with HOM enabled. Here, we limit to line edits; we allow only 1 edit per patch; and we test 100 edits sampled at random. Number of generations is set to 1 and size of generations is 10.
+```
+projectnameforgin='spatial4j'; java -Dtinylog.level=trace -cp ../../build/gin.jar gin.util.GPRuntime -j -p $projectnameforgin -d . -m $projectnameforgin.Profiler_output.csv -o $projectnameforgin.GPHOM_${editType}_patchSize${patchSize}_patchNumber${patchNumber}_output.csv -mavenHome /usr/share/maven -et 'LINE' -gn 1 -in 10 -hom true -pn 100
+```
+
 ## Contributing
 
 Please feel free to open issues and submit pull requests. If you'd like to aid in the development of Gin more generally, please get in touch with [Sandy Brownlee](mailto:sbr@cs.stir.ac.uk) or [Justyna Petke](mailto:j.petke@ucl.ac.uk). 
