@@ -10,7 +10,10 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.stream.Collectors;
+import java.util.Comparator;
+import java.util.Collections;
 
 import com.sampullara.cli.Args;
 import com.sampullara.cli.Argument;
@@ -92,6 +95,10 @@ public abstract class Sampler {
             + "You probably don't want to set this to true for Automatic Program Repair.")
     protected Boolean failFast = false;
     
+    // Top n methods for randomSampling
+    @Argument(alias = "t", description = "Top n methods to evaluate for sampling")
+    protected Integer topMethods = 0;
+    
     // Unused at the moment, thus commented out
     //@Argument(alias = "b", description = "Buffer time for test cases to be run on modified code, set only if > -1 and when -inSubprocess is false")
     //private Integer bufferTimeMS = -1;  // test case timeout: timeout on unmodified code + bufferTime
@@ -117,6 +124,8 @@ public abstract class Sampler {
     /*============== Structures holding all project data  ==============*/
 
     protected List<TargetMethod> methodData = new ArrayList<>();
+    
+    protected List<Integer> methodCount = new ArrayList();
     
     protected Set<UnitTest> testData = new LinkedHashSet<>();
 
@@ -152,6 +161,15 @@ public abstract class Sampler {
             this.classPath = project.classpath();
             Logger.info("Classpath: " + this.classPath);
         }
+        if(topMethods>0) {
+        	Map<TargetMethod,Integer> methodMap = processMethodFileGP();
+        	if(methodMap.isEmpty()) {
+        		Logger.info("No methods to process.");
+                System.exit(0);
+        	}
+        	selectTopN(methodMap,topMethods);
+        }
+        else
         this.methodData = processMethodFile();
         if (methodData.isEmpty()) {
             Logger.info("No methods to process.");
@@ -428,6 +446,106 @@ public abstract class Sampler {
         }
         return new ArrayList<>();
 
+    }
+    
+    // Method, Test and Count fields are required
+    private Map<TargetMethod,Integer> processMethodFileGP() {
+    	Map<TargetMethod,Integer> methodMap = new HashMap<>();
+
+        try {
+            CSVReaderHeaderAware reader = new CSVReaderHeaderAware(new FileReader(methodFile));
+            Map<String, String> data = reader.readMap();
+            if ( (!data.containsKey("Method")) || (!data.containsKey("Tests")) || (!data.containsKey("Count"))) {
+                throw new ParseException("Both \"Method\" and \"Tests\" fields are required in the method file.", 0);
+            }
+
+            Integer idx = 0;
+
+            while (data != null) {
+            	
+
+                String[] tests = data.get("Tests").split(TEST_SEPARATOR);
+                List<UnitTest> ginTests = new ArrayList();        
+                for (String test : tests) {
+                    UnitTest ginTest = null;        
+                    ginTest = UnitTest.fromString(test);
+                    ginTest.setTimeoutMS(timeoutMS);
+                    ginTests.add(ginTest);
+                    testData.add(ginTest);
+                }
+
+                String method = data.get("Method");
+                
+                Integer methodCount = Integer.valueOf(data.get("Count"));
+
+                String className = StringUtils.substringBefore(method, "("); // method arguments can have dots, so need to get data without arguments first
+                className = StringUtils.substringBeforeLast(className, METHOD_SEPARATOR);
+                
+                File source = (project != null) ? project.findSourceFile(className) : findSourceFile(className);
+                if ( (source == null) || (!source.isFile()) ) {
+                    throw new FileNotFoundException("Cannot find source for class: " + className);
+                }
+
+                // now using fully qualified names...
+                //String methodName = StringUtils.substringAfterLast(method, className + METHOD_SEPARATOR);
+                
+                idx++;
+                Integer methodID = (data.containsKey("MethodIndex")) ? Integer.valueOf(data.get("MethodIndex")) : idx;
+
+                TargetMethod targetMethod = new TargetMethod(source, className, method, ginTests, methodID);
+
+                if (methodMap.containsKey(targetMethod)) {
+                    throw new ParseException("Duplicate method IDs in the input file.", 0);
+                }
+                methodMap.put(targetMethod,methodCount);
+
+                data = reader.readMap();
+            }        
+            reader.close();
+
+            return methodMap;
+
+        } catch (CsvValidationException e) {
+            Logger.error(e.getMessage());
+            Logger.trace(e);
+        } catch (ParseException e) {
+            Logger.error(e.getMessage());
+            Logger.trace(e);
+        } catch (FileNotFoundException e) {
+            Logger.error(e.getMessage());
+            Logger.trace(e);
+        } catch (IOException e) {
+            Logger.error("Error reading method file: " + methodFile);
+            Logger.trace(e);
+        }
+        return methodMap;
+
+    }
+    
+    private void selectTopN(Map<TargetMethod,Integer> methodMap, int n) {
+    	
+    	if(methodMap.size()>n) {
+    		List<Map.Entry<TargetMethod, Integer> > methodList = new ArrayList<Map.Entry<TargetMethod, Integer>>(methodMap.entrySet());
+    		  
+            // Sort methodList
+            Collections.sort(methodList, new Comparator<Map.Entry<TargetMethod, Integer>>() {
+                public int compare(Map.Entry<TargetMethod, Integer> targetMethod1,Map.Entry<TargetMethod, Integer> targetMethod2){
+                    return ((targetMethod2.getValue()).compareTo(targetMethod1.getValue()));
+                }
+            });
+            
+            for (int i=0;i<n;++i) {
+           	 methodData.add(methodList.get(i).getKey());
+           	 methodCount.add(methodList.get(i).getValue());
+            }
+    	}
+    	else {
+    		for(Map.Entry<TargetMethod, Integer> methodEntry: methodMap.entrySet()) {
+    			methodData.add(methodEntry.getKey());
+              	methodCount.add(methodEntry.getValue());
+    		}
+    	}
+    	
     }
 
     // used for non-maven and non-gradle projects only

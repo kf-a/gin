@@ -261,6 +261,11 @@ Run GPSimple with HOM enabled. Here, we limit to line edits; we allow only 1 edi
 ```
 projectnameforgin='spatial4j'; java -Dtinylog.level=trace -cp ../../build/gin.jar gin.util.GPRuntime -j -p $projectnameforgin -d . -m $projectnameforgin.Profiler_output.csv -o $projectnameforgin.GPHOM_${editType}_patchSize${patchSize}_patchNumber${patchNumber}_output.csv -mavenHome /usr/share/maven -et 'LINE' -gn 1 -in 10 -hom true -pn 100
 ```
+## HOM Example with top method restriction (Maven Project)
+Run GPSimple with HOM enabled. Here, we limit to line edits; we allow only 1 edit per patch; and we test 100 edits sampled at random. Number of generations is set to 1 and size of generations is 10. Only the top 3 hot method from the profiler will be sampled.
+```
+projectnameforgin='spatial4j'; java -Dtinylog.level=trace -cp ../../build/gin.jar gin.util.GPRuntime -j -p $projectnameforgin -d . -m $projectnameforgin.Profiler_output.csv -o $projectnameforgin.GPHOM_${editType}_patchSize${patchSize}_patchNumber${patchNumber}_output.csv -mavenHome /usr/share/maven -et 'LINE' -gn 1 -in 10 -hom true -pn 100 -top 3
+```
 
 ## Contributing
 
