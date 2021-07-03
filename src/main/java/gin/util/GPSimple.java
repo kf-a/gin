@@ -209,25 +209,6 @@ public abstract class GPSimple extends GP {
         }
         //multiple FOM-Patches found -> combine FOM-Patches randomly to form HOM-Patches for first generation
         else {
-        	//TODO find stopping criterion in loop abort (e.g. timeout<1000)
-        	/*for (int i=0, timeout=0; i < indNumber && timeout<(10*indNumber); ++timeout) {
-        		List<Integer> editedLines = new ArrayList<Integer>();
-        		List<Patch> patchesToCombine = new ArrayList<Patch>();
-        		int j=0;
-        		int timeoutLoop=0;
-        		//TODO what if there are no distinctive Patches?	--> break after x times in loop?
-        		while(j<2 && timeoutLoop<100) {
-        			Patch FOMPatch = FOMPatches.get(super.individualRng.nextInt(FOMPatches.size()));
-        			List<Integer> editedLinesPatch = FOMPatch.getEditedLines();
-        			//only combine distinctive FOM patches (different edited lines)
-        			if(!editedLinesPatch.containsAll(editedLines)) {
-        				editedLines.addAll(editedLinesPatch);
-        				patchesToCombine.add(FOMPatch);
-        				++j;
-        			}
-        			++timeoutLoop;
-        		}
-        		*/
         	
         	for (int i=0; i < indNumber;) {
         		
@@ -241,7 +222,7 @@ public abstract class GPSimple extends GP {
         			patchesToCombine.add(FOMPatch);
         		}
         		
-        		Logger.info(String.format("Combining Patches. Length %s",patchesToCombine.size()));
+        		Logger.info(String.format("Combining %s FOM-patches.",patchesToCombine.size()));
         		
         		Patch HOMPatch;
         		if(patchesToCombine.size()==0) {

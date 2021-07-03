@@ -64,6 +64,14 @@ public class RandomSampler extends Sampler {
     public RandomSampler(File projectDir, File methodFile) {
         super(projectDir, methodFile);
         editTypes = Edit.parseEditClassesFromString(editType);
+        printAdditionalArguments();
+    }
+    
+    //Constructor for GP-HOM
+    public RandomSampler(File projectDir, File methodFile, List<Class<? extends Edit>> editTypes) {
+        super(projectDir, methodFile);
+        this.editTypes = editTypes;
+        printAdditionalArguments();
     }
 
     private void printAdditionalArguments() {
@@ -125,6 +133,7 @@ public class RandomSampler extends Sampler {
        
        if (patchSize > 0) {
 
+    	   writeHeader();
            int size = methodData.size();
 
            Logger.info("Start applying and testing random FOM-patches by RandomSampler..");

@@ -104,11 +104,11 @@ public abstract class GP extends Sampler {
             writeNewHeader();
             
             if(homEnabled) {
-            	RandomSampler randomSampler = new RandomSampler(this.projectDirectory,this.methodFile);
+            	RandomSampler randomSampler = new RandomSampler(this.projectDirectory,this.methodFile,this.editTypes);
                 randomSampler.methodData = this.methodData;
                 randomSampler.patchNumber = this.patchNumber;
                 randomSampler.classPath = this.classPath;
-                randomSampler.editType= this.editType;
+                //randomSampler.editType= this.editType;
                 Map<TargetMethod, List<UnitTestResultSet>> targetMap = randomSampler.sampleMethodsGP();
                 
                 Set<TargetMethod> targetMethods = targetMap.keySet();
