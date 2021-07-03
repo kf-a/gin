@@ -125,7 +125,7 @@ public abstract class Sampler {
 
     protected List<TargetMethod> methodData = new ArrayList<>();
     
-    protected List<Integer> methodCount = new ArrayList();
+    protected List<Integer> methodCount = new ArrayList<>();
     
     protected Set<UnitTest> testData = new LinkedHashSet<>();
 

@@ -91,6 +91,12 @@ public class RandomSampler extends Sampler {
             writeHeader();
 
             int size = methodData.size();
+     	   	if(!methodCount.isEmpty()) {
+     	   		size=0;
+     	   		for(Integer count : methodCount) {
+     	   			size += count;
+     	   		}
+     	   	}
 
             Logger.info("Start applying and testing random patches..");
 
@@ -98,7 +104,24 @@ public class RandomSampler extends Sampler {
                 Random prng = new JDKRandomBridge(RandomSource.MT, Long.valueOf(patchSeed + (100000 * i)));
                 
                 // Pick a random method
-                TargetMethod method = methodData.get(mrng.nextInt(size));
+                TargetMethod method;
+                if(!methodCount.isEmpty()) {
+             	   int randomPosition = mrng.nextInt(size);
+             	   int count=0;
+             	   method=methodData.get(0);
+             	   for(int index=0;index<methodCount.size();++index) {
+             		   if(count>=randomPosition) {
+             			   method=methodData.get(index);
+             			   break;
+             		   }
+             		   else {
+             			   count += methodCount.get(index);
+             		   }
+             	   }
+                }
+                else{
+             	   method = methodData.get(mrng.nextInt(size));
+                }
                 Integer methodID = method.getMethodID(); 
                 File source = method.getFileSource();
 
@@ -134,7 +157,14 @@ public class RandomSampler extends Sampler {
        if (patchSize > 0) {
 
     	   writeHeader();
-           int size = methodData.size();
+    	   
+    	   int size = methodData.size();
+    	   if(!methodCount.isEmpty()) {
+    		   size=0;
+    		   for(Integer count : methodCount) {
+    			   size += count;
+    		   }
+    	   }
 
            Logger.info("Start applying and testing random FOM-patches by RandomSampler..");
 
@@ -142,7 +172,24 @@ public class RandomSampler extends Sampler {
                Random prng = new JDKRandomBridge(RandomSource.MT, Long.valueOf(patchSeed + (100000 * i)));
                
                // Pick a random method
-               TargetMethod method = methodData.get(mrng.nextInt(size));
+               TargetMethod method;
+               if(!methodCount.isEmpty()) {
+            	   int randomPosition = mrng.nextInt(size);
+            	   int count=0;
+            	   method=methodData.get(0);
+            	   for(int index=0;index<methodCount.size();++index) {
+            		   if(count>=randomPosition) {
+            			   method=methodData.get(index);
+            			   break;
+            		   }
+            		   else {
+            			   count += methodCount.get(index);
+            		   }
+            	   }
+               }
+               else{
+            	   method = methodData.get(mrng.nextInt(size));
+               }
                Integer methodID = method.getMethodID(); 
                File source = method.getFileSource();
 

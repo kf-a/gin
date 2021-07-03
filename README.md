@@ -259,12 +259,12 @@ projectnameforgin='spatial4j'; editType='STATEMENT'; patchSize='1'; patchNumber=
 ## HOM Example with a Maven Project
 Run GPSimple with HOM enabled. Here, we limit to line edits; we allow only 1 edit per patch; and we test 100 edits sampled at random. Number of generations is set to 1 and size of generations is 10.
 ```
-projectnameforgin='spatial4j'; java -Dtinylog.level=trace -cp ../../build/gin.jar gin.util.GPRuntime -j -p $projectnameforgin -d . -m $projectnameforgin.Profiler_output.csv -o $projectnameforgin.GPHOM_${editType}_patchSize${patchSize}_patchNumber${patchNumber}_output.csv -mavenHome /usr/share/maven -et 'LINE' -gn 1 -in 10 -hom true -pn 100
+projectnameforgin='spatial4j'; editType='LINE'; individualSize=10;eliteSize=5; generation=3; patchNumber=100; topN=3; java -Dtinylog.level=trace -cp ../../build/gin.jar gin.util.GPRuntime -j -p $projectnameforgin -d . -m $projectnameforgin.Profiler_output.csv -o $projectnameforgin.GPHOM_${editType}_indiviualSize${individualSize}_generationNumber${generation}_patchNumber${patchNumber}_output.csv -mavenHome /usr/share/maven -et $editType -gn $generation -in $individualSize -e $eliteSize -hom true -pn $patchNumber
 ```
 ## HOM Example with top method restriction (Maven Project)
-Run GPSimple with HOM enabled. Here, we limit to line edits; we allow only 1 edit per patch; and we test 100 edits sampled at random. Number of generations is set to 1 and size of generations is 10. Only the top 3 hot method from the profiler will be sampled.
+Run GPSimple with HOM enabled. Here, we limit to line edits; we allow only 1 edit per patch; and we test 100 edits sampled at random. Number of generations is set to 1 and size of generations is 10. Only the top 3 hot method from the profiler will be examined.
 ```
-projectnameforgin='spatial4j'; java -Dtinylog.level=trace -cp ../../build/gin.jar gin.util.GPRuntime -j -p $projectnameforgin -d . -m $projectnameforgin.Profiler_output.csv -o $projectnameforgin.GPHOM_${editType}_patchSize${patchSize}_patchNumber${patchNumber}_output.csv -mavenHome /usr/share/maven -et 'LINE' -gn 1 -in 10 -hom true -pn 100 -top 3
+projectnameforgin='spatial4j'; editType='LINE'; individualSize=10; generation=3; patchNumber=100;eliteSize=5; topN=3; java -Dtinylog.level=trace -cp ../../build/gin.jar gin.util.GPRuntime -j -p $projectnameforgin -d . -m $projectnameforgin.Profiler_output.csv -o $projectnameforgin.GPHOM_${editType}_indiviualSize${individualSize}_eliteSize${eliteSize}_generationNumber${generation}_patchNumber${patchNumber}_top${topN}methods_output.csv -mavenHome /usr/share/maven -et $editType -gn $generation -in $individualSize -e $eliteSize -hom true -pn $patchNumber -t $topN
 ```
 
 ## Contributing
