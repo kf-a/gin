@@ -1,0 +1,53 @@
+read -p "Classpath (default: ../../build/gin.jar): " classpath
+read -p "Project (default: spatial4j): " project
+read -p "ProfilerOutput (default: $project.Profiler_output.csv): " profileroutput
+read -p "mavenHome (default: /usr/share/maven): " mavenhome
+read -p "editType (default: LINE): " edittype
+read -p "Generations (default: 10): " generations
+read -p "Individuals (default: 20): " individuals
+read -p "Elites (default: 2): " elites
+read -p "Top Methods: " top
+read -p "patchNumber (defalt: 500): " patchnumber
+read -p "Experiment Iterations (default: 10): " iterations
+read -p "output file name: " outputfile
+
+: ${classpath:=../../build/gin.jar}
+: ${project:=spatial4j}
+: ${profileroutput:=$project.Profiler_output.csv}
+: ${mavenhome:=/usr/share/maven}
+: ${edittype:=LINE}
+: ${generations:=1}#10
+: ${individuals:=10}#20
+: ${elites:=2}#2
+: ${top:=2}#2
+: ${patchnumber:=5}#500
+: ${iterations:=1}#10
+: ${outputfile:="RESULTS_HOMSIZE_"$project".GPHOM_gn"$generations"_in"$individuals"_e"$elites"_pn"$patchnumber"_top"$top"_homsize"$homsize"_output.csv"}
+
+toprow=\"iteration\",\"2\",\"3\",\"4\",\"5\"
+echo $toprow >> $outputfile
+
+for ((i=0;i<$iterations;i++))
+do
+    row=\"$i\"
+    declare -a outputarray
+
+    for ((homsize=2;$homsize<=5;homsize++))
+    do
+        outputName=$project".GPHOM_HomsizeExperiment_gn"$generations"_in"$individuals"_e"$elites"_pn"$patchnumber"_top"$top"_homsize"$homsize".iteration"$i"_output.csv"
+        if [[ $top -eq $zero ]]; then
+            tmpf="$(mktemp)"
+		    /usr/bin/time -f %U -o "$tmpf" java -Dtinylog.level=trace -cp $classpath gin.util.GPRuntime -j -p $project -d . -m $profileroutput -o $outputname -mavenHome $mavenhome -et $edittype -gn $generations -in $individuals -e $elites -hom true -pn $patchnumber -homsize $homsize
+		    usertime="$(cat "$tmpf")"
+		    rm "$tmpf"
+	    else
+            tmpf="$(mktemp)"
+		    /usr/bin/time -f %U -o "$tmpf" java -Dtinylog.level=trace -cp $classpath gin.util.GPRuntime -j -p $project -d . -m $profileroutput -o $outputname -mavenHome $mavenhome -et $edittype -gn $generations -in $individuals -e $elites -hom true -t $top -pn $patchnumber -homsize $homsize
+		    usertime="$(cat "$tmpf")"
+		    rm "$tmpf"	
+	    fi
+        row=${row},\"$usertime\"
+    done
+    echo $row >> $outputfile
+done
+

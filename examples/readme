@@ -1,0 +1,6 @@
+Ausführung der Experiment-Skripte:
+-Die Skripte können als bash-Skripte in dem jeweiligen Projektordner ausgeführt werden, in dem auch der Sourcecode und die Tests als Unterordner unter src/main bzw. src/test sind (für spatial4j und chronicle-queue die top directory, für jts in /modules/core)
+-als classpath muss der Pfad zu dem gin.jar file angegeben werden
+-als Profileroutput muss der Pfad zur Profiler outputdatei angegeben werden
+-weitere Parameter können gesetzt werden, oder als default mit ENTER belassen werden
+-Nach jeder einzelnen Iteration werden de Ausgaben des Kommandos /usr/bin/time in ein csv-file geschrieben (das /usr/bin/time Kommando muss dafür installiert sein)
